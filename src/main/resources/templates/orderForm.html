@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Pancake Cloud</title>
+    <link rel="stylesheet" th:href="@{/styles.css}" />
+</head>
+<body>
+<form method="POST" th:action="@{/orders}" th:object="${pancakeOrderEntity}">
+    <h1>Order your pancake creations!</h1>
+    <img th:src="@{/images/pancakes.png}"/>
+
+    <h3>Your pancakes in this order:</h3>
+    <a th:href="@{/design}" id="another">Design another pancake</a><br/>
+    <ul>
+        <li th:each="pancake : ${pancakeOrderEntity.pancakes}">
+            <span th:text="${pancake.name}">pancake name</span></li>
+    </ul>
+
+    <div th:if="${#fields.hasErrors()}">
+        <span style="color: crimson" class="validationError">
+        Please correct the problems below and resubmit
+        </span>
+    </div>
+
+    <h3>Deliver my pancake masterpieces to...</h3>
+
+    <label for="deliveryName">Name: </label>
+    <input type="text" th:field="*{deliveryName}"/>
+    <span style="color: crimson" class="validationError"
+          th:if="${#fields.hasErrors('deliveryName')}"
+          th:errors="*{deliveryName}">Delivery Name Error</span>
+    <br/></br>
+
+    <label for="deliveryAddress">Address: </label>
+    <input type="text" th:field="*{deliveryAddress}"/>
+    <span style="color: crimson" class="validationError"
+          th:if="${#fields.hasErrors('deliveryAddress')}"
+          th:errors="*{deliveryAddress}">Delivery Address Error</span>
+    <br/></br>
+
+    <label for="phoneNum">Phone number: </label>
+    <input type="text" th:field="*{phoneNum}"/>
+    <span style="color: crimson" class="validationError"
+          th:if="${#fields.hasErrors('phoneNum')}"
+          th:errors="*{phoneNum}">Phone Number Error</span>
+    <br/></br>
+    <input type="submit" value="Submit Order"/>
+</form>
+</body>
+</html>

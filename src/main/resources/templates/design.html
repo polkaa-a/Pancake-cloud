@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Pancake Cloud</title>
+    <link rel="stylesheet" th:href="@{/styles.css}" />
+</head>
+<body>
+<h1>Design your pancake!</h1>
+<img th:src="@{/images/pancakes.png}"/>
+<form method="POST" th:object="${pancakeEntity}">
+    <div class="grid">
+        <div class="ingredient-group" id="doughs">
+            <h3>Choose your dough:</h3>
+            <div th:each="ingredient : ${dough}">
+                <input th:field="*{ingredients}" type="radio"
+                       th:value="${ingredient.id}"/>
+                <span th:text="${ingredient.name}">INGREDIENT</span><br/>
+            </div>
+        </div>
+        <div class="ingredient-group" id="fillings">
+            <h3>Choose your filling:</h3>
+            <div th:each="ingredient : ${filling}">
+                <input th:field="*{ingredients}" type="checkbox"
+                       th:value="${ingredient.id}"/>
+                <span th:text="${ingredient.name}">INGREDIENT</span><br/>
+            </div>
+        </div>
+        </br>
+        <span style="color: crimson" class="validationError"
+              th:if="${#fields.hasErrors('ingredients')}"
+              th:errors="*{ingredients}">Ingredients Number Error</span>
+        <br/>
+    </div>
+    <div>
+        <h3>Name your pancake creation:</h3>
+        <input type="text" th:field="*{name}"/>
+        <span style="color: crimson" class="validationError"
+              th:if="${#fields.hasErrors('name')}"
+              th:errors="*{name}">Name Error</span>
+        <br/>
+        <br/>
+        <button>Submit Your Pancake</button>
+    </div>
+</form>
+</body>
+</html>
