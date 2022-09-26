@@ -1,5 +1,6 @@
 package pancakes.model.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import lombok.Data;
@@ -21,5 +22,5 @@ public class PancakeEntity {
 
     @NotNull
     @Size(min=2, message="You must choose at least 2 ingredients (dough and any filling)")
-    private List<IngredientEntity> ingredients;
+    private List<IngredientRef> ingredients = new ArrayList<>();
 }

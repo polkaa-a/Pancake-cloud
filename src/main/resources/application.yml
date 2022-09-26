@@ -1,0 +1,5 @@
+spring:
+datasource:
+generate-unique-name: false
+name: pancakecloud
+#jdbc:h2:mem:tacocloud - url

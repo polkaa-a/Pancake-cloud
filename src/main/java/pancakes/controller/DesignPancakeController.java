@@ -1,8 +1,9 @@
 package pancakes.controller;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -12,61 +13,32 @@ import pancakes.model.entity.IngredientEntity;
 import pancakes.model.entity.IngredientEntity.Type;
 import pancakes.model.entity.PancakeEntity;
 import pancakes.model.entity.PancakeOrderEntity;
+import pancakes.repository.interfaces.IngredientRepository;
 
 import javax.validation.Valid;
 
 @Slf4j
 @Controller
 @RequestMapping("/design")
-/*
-@SessionAttributes -- объект pancakeOrderEntity должен поддерживаться на уровне сеанса.
-Это важно, потому что создание панкейка также является первым шагом в создании заказа,
-и созданный нами заказ необходимо будет перенести в сеанс, охватывающий несколько запросов.
-*/
 @SessionAttributes("pancakeOrderEntity")
 public class DesignPancakeController {
-    /*
-    Этот метод  будет вызываться в процессе обработки запроса
-    и создавать список объектов Ingredient, который затем будет помещен в модель
 
-    Model – это объект, в котором данные пересылаются между контроллером и любым представлением,
-    ответственным за преобразование этих данных в разметку HTML
+    private final IngredientRepository ingredientRepo;
 
-    В конечном итоге данные, помещенные в атрибуты модели, копируются в атрибуты запроса сервлета,
-    где представление найдет их и использует для отображения страницы в браузере пользователя
-    */
+    @Autowired
+    public DesignPancakeController(IngredientRepository ingredientRepo) {
+        this.ingredientRepo = ingredientRepo;
+    }
+
     @ModelAttribute
     public void addIngredientsToModel(Model model) {
-        List<IngredientEntity> ingredients = Arrays.asList(
-                new IngredientEntity("CP", "Crispy Pancake", Type.DOUGH),
-                new IngredientEntity("SC", "Soft Pancake", Type.DOUGH),
-                new IngredientEntity("SS", "Sweet Strawberries", Type.FILLING),
-                new IngredientEntity("CM", "Condensed Milk", Type.FILLING),
-                new IngredientEntity("HC", "Ham and Cheese", Type.FILLING),
-                new IngredientEntity("SCR", "Sour Cream", Type.FILLING),
-                new IngredientEntity("SB", "Sweet Blueberries", Type.FILLING)
-        );
-
-        Type[] types = Type.values();
+        Iterable<IngredientEntity> ingredients = ingredientRepo.findAll();
+        Type[] types = IngredientEntity.Type.values();
         for (Type type : types) {
             model.addAttribute(type.toString().toLowerCase(),
                     filterByType(ingredients, type));
         }
     }
-
-    /*
-    Еще два метода, также снабженных аннотацией @ModelAttribute
-
-    Эти методы просто создают новые объекты pancakeOrderEntity и pancakeEntity
-    для размещения в модели
-
-    Объект pancakeOrderEntity, упомянутый выше в аннотации @SessionAttributes,
-    хранит состояние собираемого заказа, пока клиент выбирает ингредиенты
-    для панкейка несколькими запросами
-
-    Объект pancakeEntity помещается в модель, чтобы представление, отображаемое в ответ
-    на запрос GET с путем /design, имело объект для отображения
-    */
 
     @ModelAttribute(name = "pancakeOrderEntity")
     public PancakeOrderEntity order() {
@@ -80,10 +52,9 @@ public class DesignPancakeController {
     public String showDesignForm() {
         return "design";
     }
-    private Iterable<IngredientEntity> filterByType(List<IngredientEntity> ingredients, Type type) {
-        return ingredients
-                .stream()
-                .filter(x -> x.getType().equals(type))
+    private Iterable<IngredientEntity> filterByType(Iterable<IngredientEntity> ingredients, Type type) {
+        return StreamSupport.stream(ingredients.spliterator(), false)
+                .filter(i -> i.getType().equals(type))
                 .collect(Collectors.toList());
     }
 
